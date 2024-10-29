@@ -1,1 +1,0 @@
-# elderly_activity_visualization
