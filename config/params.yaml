@@ -1,0 +1,113 @@
+# config/params.yaml
+
+/**
+ * Configuration parameters for elderly activity visualization system
+ * NCGG Nagoya Smart Living Room Demo
+ */
+
+data_fetcher:
+  ros__parameters:
+    # Server Configuration
+    server_url: "http://192.168.1.109/ncgg_icf_stage.php"
+    fetch_count: 100
+    fetch_interval: 1.0  # seconds
+    
+    # Data Management
+    max_cached_records: 1000
+    cleanup_interval: 3600  # seconds (1 hour)
+    
+    # Network Settings
+    request_timeout: 10.0  # seconds
+    retry_attempts: 3
+    retry_delay: 1.0  # seconds
+    
+    # Logging Configuration
+    log_level: "info"  # debug, info, warn, error
+    enable_detailed_logging: true
+
+activity_processor:
+  ros__parameters:
+    # Category Definitions
+    categories:
+      transportation:
+        field: "transportation_stage"
+        threshold: 0.5
+      grooming:
+        field: "grooming_stage"
+        threshold: 0.5
+      mouth_care:
+        field: "mouth_care_stage"
+        threshold: 0.5
+      basic:
+        field: "basic_stage"
+        threshold: 0.5
+      dressing:
+        field: "dressing_stage"
+        threshold: 0.5
+    
+    # Processing Settings
+    min_duration: 0.1  # minimum duration to consider (seconds)
+    max_duration: 3600.0  # maximum duration to consider (seconds)
+    smoothing_window: 5  # number of samples for smoothing
+    
+    # Update Settings
+    publish_frequency: 1.0  # Hz
+    batch_size: 50  # records to process in one batch
+    
+    # Logging Configuration
+    log_level: "info"
+    enable_statistics: true
+
+visualization:
+  ros__parameters:
+    # Radar Chart Settings
+    chart:
+      width: 800
+      height: 800
+      dpi: 100
+      background_color: "#FFFFFF"
+      grid_color: "#CCCCCC"
+      
+      # Color Settings
+      colors:
+        transportation: "#FF6B6B"
+        grooming: "#4ECDC4"
+        mouth_care: "#45B7D1"
+        basic: "#96CEB4"
+        dressing: "#FFEEAD"
+      
+      # Font Settings
+      font:
+        family: "sans-serif"
+        size: 12
+        title_size: 16
+        
+      # Legend Settings
+      legend:
+        position: "upper right"
+        font_size: 10
+        
+    # Animation Settings
+    animation:
+      enable: true
+      interval: 1000  # milliseconds
+      transition_speed: 500  # milliseconds
+    
+    # Image Publication Settings
+    image:
+      format: "png"
+      quality: 90
+      compression: 3
+    
+    # Output Settings
+    save_charts: false
+    output_directory: "/tmp/activity_charts"
+    
+    # Logging Configuration
+    log_level: "info"
+    enable_performance_metrics: true
+
+rosbridge_server:
+  ros__parameters:
+    # WebSocket Settings
+    port
