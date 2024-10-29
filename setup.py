@@ -12,8 +12,10 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        (os.path.join('share', package_name, 'launch'),
-         glob(os.path.join('launch', '*.launch.py'))),
+        # Add config files
+        (os.path.join('share', package_name, 'config'), glob('config/*.yaml')),
+        # Add launch files
+        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -30,3 +32,4 @@ setup(
         ],
     },
 )
+```
