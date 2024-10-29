@@ -1,0 +1,4 @@
+matplotlib
+requests
+numpy
+opencv-python
