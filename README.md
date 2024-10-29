@@ -156,22 +156,7 @@ data_fetcher:
    ros2 topic echo /activity_visualization
    ```
 
-## Contributing
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
-
 ## Acknowledgments
 - National Center for Geriatrics and Gerontology (NCGG), Nagoya
 - Healthcare monitoring team at NCGG
 - ROS 2 and Foxglove development communities
-
-## Contact
-For questions about the system's deployment at NCGG, please contact:
-- Email: your.email@example.com
-- Institution: NCGG Nagoya
