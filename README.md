@@ -33,7 +33,8 @@ elderly_activity_visualization/
 │   ├── visualization.py         # Creates radar charts
 │   └── utils.py                 # Utility functions
 ├── config/
-│   └── params.yaml              # Configuration parameters
+│   ├── params.yaml              # Configuration parameters
+│   └── elderly_activity_foxglove_panel.json  # Foxglove layout configuration
 ├── launch/
 │   └── visualization.launch.py  # Launch file
 ├── test/
@@ -52,6 +53,7 @@ elderly_activity_visualization/
 - ROS 2 Humble
 - Python 3.8+
 - Network access to NCGG server (192.168.1.109)
+- Foxglove Studio (latest version)
 
 ## Installation
 
@@ -98,11 +100,26 @@ You can modify the server URL and fetch count using ROS 2 parameters:
 ros2 launch elderly_activity_visualization visualization.launch.py server_url:=http://192.168.1.109/ncgg_icf_stage.php fetch_count:=100
 ```
 
-### 3. View Visualizations
+### 3. Set Up Foxglove Visualization
 1. Open Foxglove Studio
 2. Connect to WebSocket (ws://localhost:9090)
-3. Add a new panel for the visualization topic
-4. Select the `/activity_visualization` topic
+3. Import the provided layout configuration:
+   - Click on the "Layout" menu in the top navigation bar
+   - Select "Import layout"
+   - Navigate to `config/elderly_activity_foxglove_panel.json`
+   - Click "Import"
+4. The visualization panels will be automatically configured with:
+   - Radar chart display for activity distribution
+   - Raw data view for activity states
+   - Timeline view for historical data
+   - Custom parameter controls
+
+### 4. View Visualizations
+After importing the layout, you should see:
+- Activity radar chart in the main panel
+- Activity state table in the right panel
+- Timeline view at the bottom
+- Controls for adjusting visualization parameters
 
 ## Data Flow
 1. Data Fetching
@@ -139,7 +156,7 @@ data_fetcher:
 1. Connection Issues
    ```bash
    # Check server connectivity
-   ping 192.168.1.109
+   ping 192.168.11.5
    
    # Verify ROS 2 topics
    ros2 topic list
@@ -154,6 +171,12 @@ data_fetcher:
    # Verify image publications
    ros2 topic echo /activity_visualization
    ```
+
+3. Foxglove Layout Issues
+   - If the layout import fails:
+     1. Ensure you're using the latest version of Foxglove Studio
+     2. Try manually creating a new layout and copying the settings
+     3. Check if the layout file has proper read permissions
 
 ## Acknowledgments
 - National Center for Geriatrics and Gerontology (NCGG), Nagoya
