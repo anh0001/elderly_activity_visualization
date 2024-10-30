@@ -55,4 +55,11 @@ def generate_launch_description():
             }],
             output='screen'
         ),
+
+        Node(
+            package='elderly_activity_visualization',
+            executable='logo_publisher.py',
+            name='logo_publisher',
+            output='screen'
+        ),
     ])

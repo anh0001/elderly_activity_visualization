@@ -14,6 +14,7 @@ install(PROGRAMS
   scripts/data_fetcher.py
   scripts/activity_processor.py
   scripts/visualization.py
+  scripts/logo_publisher.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -32,6 +33,11 @@ install(DIRECTORY
 # Install package.xml and resource files
 install(FILES
   package.xml
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(DIRECTORY
+  resource/media
   DESTINATION share/${PROJECT_NAME}
 )
 
