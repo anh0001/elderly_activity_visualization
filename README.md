@@ -79,7 +79,7 @@ pip install -r requirements.txt
 ### 3. Build the Package
 ```bash
 # Build
-colcon build --symlink-install
+colcon build
 
 # Source the workspace
 source install/setup.bash
