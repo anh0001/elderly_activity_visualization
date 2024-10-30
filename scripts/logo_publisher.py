@@ -25,7 +25,7 @@ class LogoPublisher(Node):
         # Get package path and load image
         package_name = 'elderly_activity_visualization'
         package_path = get_package_share_directory(package_name)
-        image_path = os.path.join(package_path, 'media', 'ros2hc_logo.jpeg')
+        image_path = os.path.join(package_path, 'media', 'ros2hc_logo.jpg')
         
         # Load and store the image
         self.image = cv2.imread(image_path)
