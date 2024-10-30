@@ -26,7 +26,7 @@ elderly_activity_visualization/
 ├── .github/
 │   └── workflows/
 │       └── ci.yaml
-├── elderly_activity_visualization/
+├── scripts/
 │   ├── __init__.py
 │   ├── data_fetcher.py          # Handles data fetching from NCGG server
 │   ├── activity_processor.py     # Processes activity data
@@ -40,8 +40,7 @@ elderly_activity_visualization/
 │   ├── test_data_fetcher.py
 │   ├── test_activity_processor.py
 │   └── test_visualization.py
-├── setup.py
-├── setup.cfg
+├── CMakeLists.txt
 ├── package.xml
 ├── requirements.txt
 ├── README.md
