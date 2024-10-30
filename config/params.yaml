@@ -1,9 +1,5 @@
-# config/params.yaml
-
-/**
- * Configuration parameters for elderly activity visualization system
- * NCGG Nagoya Smart Living Room Demo
- */
+# Configuration parameters for elderly activity visualization system
+# NCGG Nagoya Smart Living Room Demo
 
 data_fetcher:
   ros__parameters:
