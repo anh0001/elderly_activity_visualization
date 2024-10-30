@@ -74,7 +74,7 @@ sudo rosdep update
 rosdep install --from-paths src --ignore-src -r -y
 
 # Install Python requirements
-pip install -r src/elderly_activity_visualization/requirements.txt
+pip install -r requirements.txt
 ```
 
 ### 3. Build the Package
