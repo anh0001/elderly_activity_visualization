@@ -1,0 +1,169 @@
+{
+    "configById": {
+      "Image!27mn90f": {
+        "cameraState": {
+          "distance": 20,
+          "perspective": true,
+          "phi": 60,
+          "target": [
+            0,
+            0,
+            0
+          ],
+          "targetOffset": [
+            0,
+            0,
+            0
+          ],
+          "targetOrientation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "thetaOffset": 45,
+          "fovy": 45,
+          "near": 0.5,
+          "far": 5000
+        },
+        "followMode": "follow-pose",
+        "scene": {},
+        "transforms": {},
+        "topics": {},
+        "layers": {},
+        "publish": {
+          "type": "point",
+          "poseTopic": "/move_base_simple/goal",
+          "pointTopic": "/clicked_point",
+          "poseEstimateTopic": "/initialpose",
+          "poseEstimateXDeviation": 0.5,
+          "poseEstimateYDeviation": 0.5,
+          "poseEstimateThetaDeviation": 0.26179939
+        },
+        "imageMode": {
+          "imageTopic": "/activity_visualization/compressed"
+        }
+      },
+      "Image!1zhgotg": {
+        "cameraState": {
+          "distance": 20,
+          "perspective": true,
+          "phi": 60,
+          "target": [
+            0,
+            0,
+            0
+          ],
+          "targetOffset": [
+            0,
+            0,
+            0
+          ],
+          "targetOrientation": [
+            0,
+            0,
+            0,
+            1
+          ],
+          "thetaOffset": 45,
+          "fovy": 45,
+          "near": 0.5,
+          "far": 5000
+        },
+        "followMode": "follow-pose",
+        "scene": {},
+        "transforms": {},
+        "topics": {},
+        "layers": {},
+        "publish": {
+          "type": "point",
+          "poseTopic": "/move_base_simple/goal",
+          "pointTopic": "/clicked_point",
+          "poseEstimateTopic": "/initialpose",
+          "poseEstimateXDeviation": 0.5,
+          "poseEstimateYDeviation": 0.5,
+          "poseEstimateThetaDeviation": 0.26179939
+        },
+        "imageMode": {
+          "imageTopic": "/activity_visualization/compressed"
+        }
+      },
+      "Plot!3xfq93h": {
+        "paths": [],
+        "showXAxisLabels": true,
+        "showYAxisLabels": true,
+        "showLegend": true,
+        "legendDisplay": "floating",
+        "showPlotValuesInLegend": false,
+        "isSynced": true,
+        "xAxisVal": "timestamp",
+        "sidebarDimension": 240
+      },
+      "Plot!3zgiilw": {
+        "paths": [],
+        "showXAxisLabels": true,
+        "showYAxisLabels": true,
+        "showLegend": true,
+        "legendDisplay": "floating",
+        "showPlotValuesInLegend": false,
+        "isSynced": true,
+        "xAxisVal": "timestamp",
+        "sidebarDimension": 240
+      },
+      "Plot!2w9g516": {
+        "paths": [],
+        "showXAxisLabels": true,
+        "showYAxisLabels": true,
+        "showLegend": true,
+        "legendDisplay": "floating",
+        "showPlotValuesInLegend": false,
+        "isSynced": true,
+        "xAxisVal": "timestamp",
+        "sidebarDimension": 240
+      },
+      "Tab!3dnpoy5": {
+        "activeTabIdx": 0,
+        "tabs": [
+          {
+            "title": "ROS2HC Activities",
+            "layout": {
+              "first": {
+                "first": "Image!27mn90f",
+                "second": "Image!1zhgotg",
+                "direction": "column",
+                "splitPercentage": 20.201005025125628
+              },
+              "second": {
+                "first": {
+                  "first": "Plot!3xfq93h",
+                  "second": "Plot!3zgiilw",
+                  "direction": "column",
+                  "splitPercentage": 49.774436090225564
+                },
+                "second": "Plot!2w9g516",
+                "direction": "column",
+                "splitPercentage": 66.83417085427136
+              },
+              "direction": "row",
+              "splitPercentage": 76.49122807017544
+            }
+          }
+        ]
+      }
+    },
+    "globalVariables": {},
+    "userNodes": {
+      "1e38748f-734f-4a55-88ae-6591549a24b7": {
+        "sourceCode": "import { useCallback, useEffect, useRef } from \"react\";\nimport { PanelExtension, MessageEvent, RenderState } from \"@foxglove/studio\";\nimport { sensor_msgs__msg__Image } from \"./type/sensor_msgs__msg__Image\";\n\ntype Config = { size: number };\ntype Props = { config: Config };\n\nexport const initPanel = (context: PanelExtension) => {\n  return () => <ActivityVisualization />;\n};\n\nexport const config = {\n  name: \"activity-visualization\",\n  topics: [\"/activity_visualization\"],\n};\n\n// Specify input/output topics\nexport const inputs = [\"/activity_visualization\"];\nexport const output = \"/visualization_debug\";\n\nfunction ActivityVisualization(): React.ReactElement {\n  const canvasRef = useRef<HTMLCanvasElement>(null);\n\n  const onMessage = useCallback(\n    (event: MessageEvent<sensor_msgs__msg__Image>) => {\n      const canvas = canvasRef.current;\n      if (!canvas || !event.message) {\n        console.log(\"No canvas or message\");\n        return;\n      }\n\n      const ctx = canvas.getContext(\"2d\");\n      if (!ctx) {\n        console.log(\"No context\");\n        return;\n      }\n\n      // Get image data from the message\n      const { data, width, height, encoding } = event.message;\n\n      if (!data || !width || !height) {\n        console.log(\"Missing image data\");\n        return;\n      }\n\n      // Set canvas size to match image dimensions\n      canvas.width = width;\n      canvas.height = height;\n\n      // Create image data\n      const uint8Data = new Uint8ClampedArray(data);\n      const imageData = new ImageData(uint8Data, width);\n\n      // Put the image data directly\n      ctx.putImageData(imageData, 0, 0);\n    },\n    [],\n  );\n\n  const renderState = useCallback(\n    (renderState: RenderState, done: () => void) => {\n      renderState.topics[\"/activity_visualization\"];\n      done();\n    },\n    [],\n  );\n\n  return (\n    <div\n      style={{\n        height: \"100%\",\n        width: \"100%\",\n        display: \"flex\",\n        alignItems: \"center\",\n        justifyContent: \"center\",\n        backgroundColor: \"#f3f4f6\",\n      }}\n    >\n      <div\n        style={{\n          position: \"relative\",\n          width: \"100%\",\n          height: \"100%\",\n        }}\n      >\n        <canvas\n          ref={canvasRef}\n          style={{\n            position: \"absolute\",\n            top: \"50%\",\n            left: \"50%\",\n            transform: \"translate(-50%, -50%)\",\n            maxWidth: \"100%\",\n            maxHeight: \"100%\",\n          }}\n        />\n      </div>\n    </div>\n  );\n}\n\nexport default ActivityVisualization;\n",
+        "name": "activity_visualization.ts"
+      },
+      "84bb9215-2485-4b58-ba18-5591d23aa58c": {
+        "sourceCode": "export type sensor_msgs__msg__Image = {\n  header: {\n    stamp: {\n      sec: number;\n      nanosec: number;\n    };\n    frame_id: string;\n  };\n  height: number;\n  width: number;\n  encoding: string;\n  is_bigendian: number;\n  step: number;\n  data: Uint8Array;\n};\n",
+        "name": "sensor_msgs__msg__Image.ts"
+      }
+    },
+    "playbackConfig": {
+      "speed": 1
+    },
+    "layout": "Tab!3dnpoy5"
+  }
