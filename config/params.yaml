@@ -9,8 +9,8 @@ data_fetcher:
   ros__parameters:
     # Server Configuration
     server_url: "http://192.168.1.109/ncgg_icf_stage.php"
-    fetch_count: 100
-    fetch_interval: 1.0  # seconds
+    fetch_interval: 1.0  # How often to get new data in seconds
+    fetch_count: 100    # How many records to fetch
     
     # Data Management
     max_cached_records: 1000
@@ -51,8 +51,8 @@ activity_processor:
     smoothing_window: 5  # number of samples for smoothing
     
     # Update Settings
-    publish_frequency: 1.0  # Hz
-    batch_size: 50  # records to process in one batch
+    publish_frequency: 1.0  # How often to update radar chart, Hz
+    batch_size: 50          # records to process in one batch
     
     # Logging Configuration
     log_level: "info"
