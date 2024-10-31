@@ -34,7 +34,7 @@ class ICFStagingVisualizer(Node):
         # Create subscription to processed staging data
         self.subscription = self.create_subscription(
             String,
-            'processed_icf_stages',
+            '/processed_icf_stages',
             self.visualization_callback,
             qos_profile
         )
@@ -42,7 +42,7 @@ class ICFStagingVisualizer(Node):
         # Create publisher for the visualization
         self.image_publisher = self.create_publisher(
             CompressedImage,
-            'icf_staging_visualization/compressed',
+            '/icf_staging_visualization/compressed',
             qos_profile
         )
         

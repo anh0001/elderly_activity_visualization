@@ -25,14 +25,14 @@ class ActivityVisualizer(Node):
         
         self.subscription = self.create_subscription(
             String,
-            'processed_activities',
+            '/processed_activities',
             self.visualization_callback,
             qos_profile
         )
         
         self.image_publisher = self.create_publisher(
             CompressedImage,
-            'activity_visualization/compressed',
+            '/activity_visualization/compressed',
             qos_profile
         )
         

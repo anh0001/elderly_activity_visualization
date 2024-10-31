@@ -19,7 +19,7 @@ class ActivityProcessor(Node):
             String,
             'raw_activity_data',
             self.raw_data_callback,
-            10
+            1000
         )
         
         # Publisher for processed data
