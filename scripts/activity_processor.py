@@ -6,6 +6,7 @@ from std_msgs.msg import String
 import json
 from collections import defaultdict
 from datetime import datetime
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
 
 class ActivityProcessor(Node):
     def __init__(self):
@@ -22,11 +23,17 @@ class ActivityProcessor(Node):
             1000
         )
         
+        qos_profile = QoSProfile(
+            reliability=QoSReliabilityPolicy.RELIABLE,
+            history=QoSHistoryPolicy.KEEP_LAST,
+            depth=10
+        )
+
         # Publisher for processed data
         self.publisher = self.create_publisher(
             String, 
             'processed_activities',
-            10
+            qos_profile
         )
         
         self.get_logger().info('Activity processor initialized')
