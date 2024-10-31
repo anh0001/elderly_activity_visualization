@@ -18,6 +18,8 @@ def generate_launch_description():
             parameters=[config_file],
             output='screen'
         ),
+
+        # Activity Duration
         Node(
             package='elderly_activity_visualization',
             executable='activity_processor',
@@ -32,6 +34,23 @@ def generate_launch_description():
             parameters=[config_file],
             output='screen'
         ),
+
+        # ICF Staging
+        Node(
+            package='elderly_activity_visualization',
+            executable='icf_staging_processor',
+            name='icf_staging_processor',
+            parameters=[config_file],
+            output='screen'
+        ),
+        Node(
+            package='elderly_activity_visualization',
+            executable='icf_staging_visualizer',
+            name='icf_staging_visualizer',
+            parameters=[config_file],
+            output='screen'
+        ),
+
         # Add rosapi node
         Node(
             package='rosapi',

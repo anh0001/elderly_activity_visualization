@@ -14,6 +14,8 @@ install(PROGRAMS
   scripts/data_fetcher.py
   scripts/activity_processor.py
   scripts/activity_visualizer.py
+  scripts/icf_staging_processor.py
+  scripts/icf_staging_visualizer.py
   scripts/logo_publisher.py
   DESTINATION lib/${PROJECT_NAME}
 )
@@ -53,6 +55,8 @@ set(PYTHON_SCRIPTS
   data_fetcher
   activity_processor
   activity_visualizer
+  icf_staging_processor
+  icf_staging_visualizer
 )
 
 foreach(script ${PYTHON_SCRIPTS})
