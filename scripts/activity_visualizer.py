@@ -29,7 +29,7 @@ class ActivityVisualizer(Node):
             self.visualization_callback,
             qos_profile
         )
-        
+
         self.image_publisher = self.create_publisher(
             CompressedImage,
             '/activity_visualization/compressed',
@@ -38,7 +38,33 @@ class ActivityVisualizer(Node):
         
         self._publish_dummy_image()
         self.get_logger().info('Activity visualizer initialized')
+
+        # # Wait a short time to ensure topic advertisement
+        # self.create_timer(5.0, self._create_subscription_delayed, callback_group=None)
         
+    # def _create_subscription_delayed(self):
+    #     """Create subscription after ensuring publisher is ready."""
+    #     qos_profile = QoSProfile(
+    #         reliability=QoSReliabilityPolicy.RELIABLE,
+    #         history=QoSHistoryPolicy.KEEP_LAST,
+    #         depth=10
+    #     )
+        
+    #     self.subscription = self.create_subscription(
+    #         String,
+    #         '/processed_activities',
+    #         self.visualization_callback,
+    #         qos_profile
+    #     )
+        
+    #     # Destroy the timer as it's no longer needed
+    #     for timer in self.get_timer_handles():
+    #         if timer.callback == self._create_subscription_delayed:
+    #             self.destroy_timer(timer)
+    #             break
+                
+    #     self.get_logger().info('Activity visualizer fully initialized')
+
     def _fig_to_jpeg_bytes(self, fig):
         """Convert matplotlib figure to JPEG bytes."""
         buf = io.BytesIO()

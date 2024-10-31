@@ -11,29 +11,15 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        # Add rosapi node
-        Node(
-            package='rosapi',
-            executable='rosapi_node',
-            name='rosapi_node',
-            output='screen'
-        ),
 
-        # Configure rosbridge with proper parameters
+        # Data Fetcher
         Node(
-            package='rosbridge_server',
-            executable='rosbridge_websocket',
-            name='rosbridge_websocket',
-            parameters=[{
-                'port': 9090,
-                'address': '0.0.0.0',
-                'retry_startup_delay': 5.0,
-                'fragment_timeout': 600,
-                'delay_between_messages': 0,
-                'max_message_size': 10000000,
-                'unregister_timeout': 10.0
-            }],
-            output='screen'
+            package='elderly_activity_visualization',
+            executable='data_fetcher',
+            name='data_fetcher',
+            parameters=[config_file],
+            output='screen',
+            prefix='bash -c "sleep 2.0 && $0 $@"'
         ),
 
         # Activity Duration
@@ -42,14 +28,16 @@ def generate_launch_description():
             executable='activity_processor',
             name='activity_processor',
             parameters=[config_file],
-            output='screen'
+            output='screen',
+            prefix='bash -c "sleep 2.0 && $0 $@"'
         ),
         Node(
             package='elderly_activity_visualization',
             executable='activity_visualizer',
             name='activity_visualizer',
             parameters=[config_file],
-            output='screen'
+            output='screen',
+            prefix='bash -c "sleep 5.0 && $0 $@"'
         ),
 
         # # ICF Staging
@@ -75,12 +63,28 @@ def generate_launch_description():
             output='screen'
         ),
 
-        # Data Fetcher
+        # Add rosapi node
         Node(
-            package='elderly_activity_visualization',
-            executable='data_fetcher',
-            name='data_fetcher',
-            parameters=[config_file],
+            package='rosapi',
+            executable='rosapi_node',
+            name='rosapi_node',
+            output='screen'
+        ),
+
+        # Configure rosbridge with proper parameters
+        Node(
+            package='rosbridge_server',
+            executable='rosbridge_websocket',
+            name='rosbridge_websocket',
+            parameters=[{
+                'port': 9090,
+                'address': '0.0.0.0',
+                'retry_startup_delay': 5.0,
+                'fragment_timeout': 600,
+                'delay_between_messages': 0,
+                'max_message_size': 10000000,
+                'unregister_timeout': 10.0
+            }],
             output='screen'
         ),
     ])
