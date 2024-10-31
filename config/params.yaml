@@ -4,7 +4,7 @@
 data_fetcher:
   ros__parameters:
     # Server Configuration
-    server_url: "http://192.168.11.5/ncgg_icf_stage.php"
+    server_url: "http://192.168.11.205/ncgg_icf_stage.php"
     fetch_interval: 1.0  # How often to get new data in seconds
     fetch_count: 100    # How many records to fetch
     
