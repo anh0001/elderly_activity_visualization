@@ -7,6 +7,7 @@ from rcl_interfaces.msg import ParameterDescriptor
 from std_msgs.msg import String
 import json
 from datetime import datetime
+import os
 
 class DataFetcher(Node):
     def __init__(self):
@@ -28,6 +29,16 @@ class DataFetcher(Node):
             1.0,
             ParameterDescriptor(description='Data fetch interval in seconds')
         )
+        self.declare_parameter(
+            'use_test_data', 
+            False,
+            ParameterDescriptor(description='Whether to use test data instead of server')
+        )
+        self.declare_parameter(
+            'test_data_path',
+            os.path.join(os.path.dirname(__file__), '..', 'test', 'test_data', 'sample_activity_data.json'),
+            ParameterDescriptor(description='Path to test data file')
+        )
         
         # Initialize publisher for raw activity data
         self.raw_data_publisher = self.create_publisher(
@@ -37,13 +48,58 @@ class DataFetcher(Node):
         )
         
         self.processed_ids = set()
+        self.test_data_cache = None  # Cache for test data
+        
         self.create_timer(
             self.get_parameter('fetch_interval').value,
             self.fetch_data
         )
         
+    def load_test_data(self):
+        """Load test data from file if not already cached."""
+        if self.test_data_cache is None:
+            try:
+                test_data_path = self.get_parameter('test_data_path').value
+                with open(test_data_path, 'r') as f:
+                    self.test_data_cache = json.load(f)
+                self.get_logger().info(f'Loaded test data from {test_data_path}')
+            except Exception as e:
+                self.get_logger().error(f'Error loading test data: {str(e)}')
+                return None
+        return self.test_data_cache
+        
     def fetch_data(self):
-        """Fetch activity data from server."""
+        """Fetch activity data from server or test data."""
+        if self.get_parameter('use_test_data').value:
+            self.fetch_test_data()
+        else:
+            self.fetch_server_data()
+            
+    def fetch_test_data(self):
+        """Fetch data from test data file."""
+        try:
+            test_data = self.load_test_data()
+            if test_data is None:
+                return
+                
+            count = self.get_parameter('fetch_count').value
+            new_data = [
+                record for record in test_data['data']
+                if record['create_dt'] not in self.processed_ids
+            ][:count]  # Limit to fetch_count
+            
+            if new_data:
+                self.get_logger().info(f'Found {len(new_data)} new records from test data')
+                self.process_new_data(new_data)
+                self.processed_ids.update(
+                    record['create_dt'] for record in new_data
+                )
+                
+        except Exception as e:
+            self.get_logger().error(f'Error processing test data: {str(e)}')
+            
+    def fetch_server_data(self):
+        """Fetch data from server."""
         try:
             url = self.get_parameter('server_url').value
             count = self.get_parameter('fetch_count').value
@@ -58,7 +114,7 @@ class DataFetcher(Node):
             ]
             
             if new_data:
-                self.get_logger().info(f'Found {len(new_data)} new records')
+                self.get_logger().info(f'Found {len(new_data)} new records from server')
                 self.process_new_data(new_data)
                 self.processed_ids.update(
                     record['create_dt'] for record in new_data

@@ -8,6 +8,10 @@ data_fetcher:
     fetch_interval: 1.0  # How often to get new data in seconds
     fetch_count: 100    # How many records to fetch
     
+    # Test Data Configuration
+    use_test_data: true  # Set to true to use test data instead of server
+    test_data_path: "test/test_data/sample_activity_data.json"
+    
     # Data Management
     max_cached_records: 1000
     cleanup_interval: 3600  # seconds (1 hour)
