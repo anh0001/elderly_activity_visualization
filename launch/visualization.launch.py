@@ -12,14 +12,20 @@ def generate_launch_description():
 
     return LaunchDescription([
 
+        Node(
+            package='elderly_activity_visualization',
+            executable='logo_publisher.py',
+            name='logo_publisher',
+            output='screen'
+        ),
+
         # Data Fetcher
         Node(
             package='elderly_activity_visualization',
             executable='data_fetcher',
             name='data_fetcher',
             parameters=[config_file],
-            output='screen',
-            prefix='bash -c "sleep 2.0 && $0 $@"'
+            output='screen'
         ),
 
         # Activity Duration
@@ -28,8 +34,7 @@ def generate_launch_description():
             executable='activity_processor',
             name='activity_processor',
             parameters=[config_file],
-            output='screen',
-            prefix='bash -c "sleep 2.0 && $0 $@"'
+            output='screen'
         ),
         Node(
             package='elderly_activity_visualization',
@@ -37,7 +42,7 @@ def generate_launch_description():
             name='activity_visualizer',
             parameters=[config_file],
             output='screen',
-            prefix='bash -c "sleep 5.0 && $0 $@"'
+            # prefix='bash -c "sleep 2.0 && $0 $@"'
         ),
 
         # # ICF Staging
@@ -55,13 +60,6 @@ def generate_launch_description():
         #     parameters=[config_file],
         #     output='screen'
         # ),
-
-        Node(
-            package='elderly_activity_visualization',
-            executable='logo_publisher.py',
-            name='logo_publisher',
-            output='screen'
-        ),
 
         # Add rosapi node
         Node(

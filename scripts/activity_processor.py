@@ -20,7 +20,7 @@ class ActivityProcessor(Node):
             String,
             'raw_activity_data',
             self.raw_data_callback,
-            1000
+            100
         )
         
         qos_profile = QoSProfile(

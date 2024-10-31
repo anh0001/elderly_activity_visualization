@@ -49,6 +49,7 @@ class DataFetcher(Node):
         
         self.processed_ids = set()
         self.test_data_cache = None  # Cache for test data
+        self.current_test_data_index = 0  # Track current position in test data
         
         self.create_timer(
             self.get_parameter('fetch_interval').value,
@@ -76,24 +77,48 @@ class DataFetcher(Node):
             self.fetch_server_data()
             
     def fetch_test_data(self):
-        """Fetch data from test data file."""
+        """Fetch data from test data file with pagination."""
         try:
             test_data = self.load_test_data()
-            if test_data is None:
+            if test_data is None or 'data' not in test_data:
                 return
                 
-            count = self.get_parameter('fetch_count').value
+            # Get parameters
+            fetch_count = self.get_parameter('fetch_count').value
+            all_records = test_data['data']
+            total_records = len(all_records)
+            
+            # Calculate the range for this batch
+            start_idx = self.current_test_data_index
+            end_idx = min(start_idx + fetch_count, total_records)
+            
+            # Get the next batch of records
+            current_batch = all_records[start_idx:end_idx]
+            
+            # Filter out already processed records
             new_data = [
-                record for record in test_data['data']
+                record for record in current_batch
                 if record['create_dt'] not in self.processed_ids
-            ][:count]  # Limit to fetch_count
+            ]
             
             if new_data:
-                self.get_logger().info(f'Found {len(new_data)} new records from test data')
+                self.get_logger().info(
+                    f'Processing records {start_idx} to {end_idx} '
+                    f'({len(new_data)} new records)'
+                )
                 self.process_new_data(new_data)
                 self.processed_ids.update(
                     record['create_dt'] for record in new_data
                 )
+            
+            # Update index for next fetch
+            self.current_test_data_index = end_idx
+            
+            # Reset to beginning if we've reached the end
+            if self.current_test_data_index >= total_records:
+                self.get_logger().info('Reached end of test data, resetting to beginning')
+                self.current_test_data_index = 0
+                self.processed_ids.clear()  # Clear processed IDs to allow reprocessing
                 
         except Exception as e:
             self.get_logger().error(f'Error processing test data: {str(e)}')
@@ -146,7 +171,10 @@ class DataFetcher(Node):
             # Publish data for processing
             self.raw_data_publisher.publish(msg)
             
-            self.get_logger().debug(f'Published {len(sorted_data)} records for processing')
+            self.get_logger().debug(
+                f'Published {len(sorted_data)} records for processing '
+                f'(Total processed: {len(self.processed_ids)})'
+            )
             
         except Exception as e:
             self.get_logger().error(f'Error processing data: {str(e)}')
