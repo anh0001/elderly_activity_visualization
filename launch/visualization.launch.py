@@ -45,21 +45,21 @@ def generate_launch_description():
             # prefix='bash -c "sleep 2.0 && $0 $@"'
         ),
 
-        # # ICF Staging
-        # Node(
-        #     package='elderly_activity_visualization',
-        #     executable='icf_staging_processor',
-        #     name='icf_staging_processor',
-        #     parameters=[config_file],
-        #     output='screen'
-        # ),
-        # Node(
-        #     package='elderly_activity_visualization',
-        #     executable='icf_staging_visualizer',
-        #     name='icf_staging_visualizer',
-        #     parameters=[config_file],
-        #     output='screen'
-        # ),
+        # ICF Staging
+        Node(
+            package='elderly_activity_visualization',
+            executable='icf_staging_processor',
+            name='icf_staging_processor',
+            parameters=[config_file],
+            output='screen'
+        ),
+        Node(
+            package='elderly_activity_visualization',
+            executable='icf_staging_visualizer',
+            name='icf_staging_visualizer',
+            parameters=[config_file],
+            output='screen'
+        ),
 
         # Add rosapi node
         Node(

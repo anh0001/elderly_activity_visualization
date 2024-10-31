@@ -28,7 +28,7 @@ class ICFStagingProcessor(Node):
             String,
             'raw_activity_data',
             self.raw_data_callback,
-            1000
+            100
         )
         
         # Create QoS profile for sensor-like data

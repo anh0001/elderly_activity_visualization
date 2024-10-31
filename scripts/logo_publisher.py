@@ -19,8 +19,8 @@ class LogoPublisher(Node):
             10
         )
         
-        # Set timer for periodic publishing (1 Hz)
-        self.timer = self.create_timer(1.0, self.timer_callback)
+        # Set timer for periodic publishing (1/10 Hz)
+        self.timer = self.create_timer(10.0, self.timer_callback)
         
         # Get package path and load image
         package_name = 'elderly_activity_visualization'
