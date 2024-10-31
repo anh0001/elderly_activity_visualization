@@ -88,7 +88,52 @@
       "imageMode": {
         "imageTopic": "/activity_visualization/compressed"
       },
-      "foxglovePanelTitle": "Activity Categories Duration"
+      "foxglovePanelTitle": "Activity Duration"
+    },
+    "Image!35ppmhm": {
+      "cameraState": {
+        "distance": 20,
+        "perspective": true,
+        "phi": 60,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "thetaOffset": 45,
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "scene": {},
+      "transforms": {},
+      "topics": {},
+      "layers": {},
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {
+        "imageTopic": "/icf_staging_visualization/compressed"
+      },
+      "foxglovePanelTitle": "ICF Staging"
     },
     "Plot!3xfq93h": {
       "paths": [],
@@ -134,7 +179,11 @@
           "layout": {
             "first": {
               "first": "Image!27mn90f",
-              "second": "Image!1zhgotg",
+              "second": {
+                "first": "Image!1zhgotg",
+                "second": "Image!35ppmhm",
+                "direction": "row"
+              },
               "direction": "column",
               "splitPercentage": 20.201005025125628
             },
@@ -150,7 +199,7 @@
               "splitPercentage": 66.83417085427136
             },
             "direction": "row",
-            "splitPercentage": 73.50877192982456
+            "splitPercentage": 74.26900584795322
           }
         }
       ]
