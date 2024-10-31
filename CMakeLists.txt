@@ -13,7 +13,7 @@ ament_python_install_package(scripts)
 install(PROGRAMS
   scripts/data_fetcher.py
   scripts/activity_processor.py
-  scripts/visualization.py
+  scripts/activity_visualizer.py
   scripts/logo_publisher.py
   DESTINATION lib/${PROJECT_NAME}
 )
@@ -52,7 +52,7 @@ install(FILES
 set(PYTHON_SCRIPTS
   data_fetcher
   activity_processor
-  visualization
+  activity_visualizer
 )
 
 foreach(script ${PYTHON_SCRIPTS})

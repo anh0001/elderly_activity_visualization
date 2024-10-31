@@ -54,7 +54,7 @@ activity_processor:
     log_level: "info"
     enable_statistics: true
 
-visualization:
+activity_visualizer:
   ros__parameters:
     # Radar Chart Settings
     chart:
@@ -91,7 +91,7 @@ visualization:
     
     # Image Publication Settings
     image:
-      format: "png"
+      format: "jpg"
       quality: 90
       compression: 3
     

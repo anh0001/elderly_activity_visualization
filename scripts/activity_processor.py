@@ -6,25 +6,13 @@ from std_msgs.msg import String
 import json
 from collections import defaultdict
 from datetime import datetime
-import random
 
 class ActivityProcessor(Node):
     def __init__(self):
         super().__init__('activity_processor')
         
-        # Define activity categories and their corresponding fields
-        self.categories = {
-            'transportation': 'transportation_stage',
-            'grooming': 'grooming_stage',
-            'mouth_care': 'mouth_care_stage',
-            'basic': 'basic_stage',
-            'dressing': 'dressing_stage'
-        }
-        
-        # Initialize tracking variables
-        self.category_durations = defaultdict(float)
-        self.previous_values = {}
-        self.last_timestamp = None
+        # Initialize action durations tracking
+        self.action_durations = defaultdict(float)
         
         # Create subscription to raw data
         self.subscription = self.create_subscription(
@@ -69,80 +57,39 @@ class ActivityProcessor(Node):
         except Exception as e:
             self.get_logger().error(f'Error in process_activities: {str(e)}')
 
-    #
-    # TODO: For testing only with random condition to check the visualization
     def _process_record(self, record):
-        """Process individual activity record with random selection."""
+        """Process individual activity record."""
         try:
-            timestamp = datetime.strptime(record['create_dt'], '%Y-%m-%d %H:%M:%S')
+            # Extract action and duration
+            action = record['action']
+            duration = float(record['duration'])
             
-            for category, field in self.categories.items():
-                current_value = record[field]
-                
-                # Initialize if first record
-                if category not in self.previous_values:
-                    self.previous_values[category] = current_value
-                    continue
-                
-                # Randomly decide whether to add duration (30% chance)
-                if random.random() < 0.3:  # Adjust this probability as needed
-                    # Add duration to the appropriate category
-                    duration = float(record['duration'])
-                    # Add some random variation to the duration
-                    adjusted_duration = duration * random.uniform(0.5, 2.0)
-                    self.category_durations[category] += adjusted_duration
-                    
-                    self.get_logger().debug(
-                        f'Category {category} updated: {self.category_durations[category]}'
-                    )
-                    
-                self.previous_values[category] = current_value
+            # Add duration to the appropriate action
+            self.action_durations[action] += duration
+            
+            self.get_logger().debug(
+                f'Action {action} updated: {self.action_durations[action]}'
+            )
                     
         except Exception as e:
             self.get_logger().error(f'Error processing record: {str(e)}')
-
-    # def _process_record(self, record):
-    #     """Process individual activity record."""
-    #     try:
-    #         timestamp = datetime.strptime(record['create_dt'], '%Y-%m-%d %H:%M:%S')
-            
-    #         for category, field in self.categories.items():
-    #             current_value = record[field]
-                
-    #             # Initialize if first record
-    #             if category not in self.previous_values:
-    #                 self.previous_values[category] = current_value
-    #                 continue
-                
-    #             # Check if value changed
-    #             if current_value != self.previous_values[category]:
-    #                 # Add duration to the appropriate category
-    #                 self.category_durations[category] += float(record['duration'])
-    #                 self.previous_values[category] = current_value
-                    
-    #                 self.get_logger().debug(
-    #                     f'Category {category} updated: {self.category_durations[category]}'
-    #                 )
-                    
-    #     except Exception as e:
-    #         self.get_logger().error(f'Error processing record: {str(e)}')
             
     def _publish_durations(self):
-        """Publish processed durations as radar chart data."""
+        """Publish processed durations as chart data."""
         try:
             # Prepare message
             msg = String()
             msg.data = json.dumps({
-                'type': 'radar_chart',
+                'type': 'action_durations',
                 'timestamp': datetime.now().isoformat(),
-                'data': dict(self.category_durations)
+                'data': dict(self.action_durations)
             })
             
             # Publish message
             self.publisher.publish(msg)
             
             self.get_logger().debug(
-                f'Published durations: {dict(self.category_durations)}'
+                f'Published action durations: {dict(self.action_durations)}'
             )
             
         except Exception as e:

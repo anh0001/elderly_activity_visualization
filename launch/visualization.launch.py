@@ -27,8 +27,8 @@ def generate_launch_description():
         ),
         Node(
             package='elderly_activity_visualization',
-            executable='visualization',
-            name='visualization',
+            executable='activity_visualizer',
+            name='activity_visualizer',
             parameters=[config_file],
             output='screen'
         ),

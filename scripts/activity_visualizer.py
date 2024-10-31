@@ -47,7 +47,7 @@ class ActivityVisualizer(Node):
                    facecolor='white',
                    dpi=100,
                    pad_inches=0.5,
-                   quality=80)  # JPEG quality
+                   quality=80)
         buf.seek(0)
         return buf.getvalue()
         
@@ -56,7 +56,7 @@ class ActivityVisualizer(Node):
             # Create a simple figure
             fig = Figure(figsize=(8, 8), facecolor='white')
             ax = fig.add_subplot(111)
-            ax.text(0.5, 0.5, 'Initializing...', 
+            ax.text(0.5, 0.5, 'Initializing Activity Visualization...', 
                    horizontalalignment='center',
                    verticalalignment='center',
                    transform=ax.transAxes,
@@ -82,15 +82,15 @@ class ActivityVisualizer(Node):
             self.get_logger().info('Received data on processed_activities')
             data = json.loads(msg.data)
             
-            if data['type'] != 'radar_chart' or not data['data']:
+            if data['type'] != 'action_durations' or not data['data']:
                 return
                 
-            self.get_logger().info(f'Received data: {data["data"]}')
+            self.get_logger().info(f'Received activity data: {data["data"]}')
             
             # Create radar chart
-            categories = list(data['data'].keys())
+            activities = list(data['data'].keys())
             values = list(data['data'].values())
-            num_vars = len(categories)
+            num_vars = len(activities)
             
             if num_vars == 0:
                 return
@@ -112,15 +112,16 @@ class ActivityVisualizer(Node):
             ax.set_theta_offset(np.pi / 2)
             ax.set_theta_direction(-1)
             ax.set_xticks(angles[:-1])
-            ax.set_xticklabels(categories, size=12)
-            ax.set_title("Activity Categories Duration", pad=20, size=14, weight='bold')
+            ax.set_xticklabels(activities, size=10)  # Adjusted font size for potentially longer labels
+            ax.set_title("Activities Duration Analysis", pad=20, size=14, weight='bold')
             ax.grid(True, color='gray', alpha=0.3)
             
             # Add value annotations
-            for angle, value, category in zip(angles[:-1], values[:-1], categories):
-                ax.text(angle, value*1.1, f'{value:.1f}', 
+            for angle, value, activity in zip(angles[:-1], values[:-1], activities):
+                ax.text(angle, value*1.1, f'{value:.1f}s', 
                        horizontalalignment='center',
-                       verticalalignment='center')
+                       verticalalignment='center',
+                       size=9)  # Adjusted font size for duration labels
             
             # Create message
             msg = CompressedImage()
