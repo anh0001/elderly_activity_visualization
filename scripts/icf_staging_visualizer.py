@@ -6,7 +6,7 @@ from std_msgs.msg import String
 import json
 import numpy as np
 from sensor_msgs.msg import CompressedImage
-from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy, QoSDurabilityPolicy
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import io

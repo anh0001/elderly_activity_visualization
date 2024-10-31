@@ -27,7 +27,7 @@ class ActivityVisualizer(Node):
             String,
             '/processed_activities',
             self.visualization_callback,
-            qos_profile
+            10
         )
         
         self.image_publisher = self.create_publisher(

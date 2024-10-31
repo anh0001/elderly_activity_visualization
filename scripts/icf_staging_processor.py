@@ -5,6 +5,7 @@ from rclpy.node import Node
 from std_msgs.msg import String
 import json
 from datetime import datetime
+from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy, QoSDurabilityPolicy
 
 class ICFStagingProcessor(Node):
     def __init__(self):
@@ -30,11 +31,18 @@ class ICFStagingProcessor(Node):
             1000
         )
         
+        # Create QoS profile for sensor-like data
+        qos_profile = QoSProfile(
+            reliability=QoSReliabilityPolicy.RELIABLE,
+            history=QoSHistoryPolicy.KEEP_LAST,
+            depth=10
+        )
+
         # Publisher for processed staging data
         self.publisher = self.create_publisher(
             String, 
             'processed_icf_stages',
-            10
+            qos_profile
         )
         
         self.get_logger().info('ICF staging processor initialized')
