@@ -23,24 +23,28 @@ This ROS 2 package provides real-time visualization of elderly activities in a s
 ## Repository Structure
 ```
 elderly_activity_visualization/
-├── .github/
-│   └── workflows/
-│       └── ci.yaml
 ├── scripts/
 │   ├── __init__.py
 │   ├── data_fetcher.py          # Handles data fetching from NCGG server
 │   ├── activity_processor.py     # Processes activity data
-│   ├── visualization.py         # Creates radar charts
-│   └── utils.py                 # Utility functions
+│   ├── activity_visualizer.py    # Creates radar charts
+│   ├── logo_publisher.py         # Publishes logo image
+│   ├── icf_staging_processor.py  # Processes ICF staging data
+│   └── icf_staging_visualizer.py # Visualizes ICF staging data
 ├── config/
 │   ├── params.yaml              # Configuration parameters
-│   └── elderly_activity_foxglove_panel.json  # Foxglove layout configuration
+│   └── layouts/
+│       └── elderly_activity_foxglove_panel.json  # Foxglove layout configuration
+├── resource/
+│   └── elderly_activity_visualization
 ├── launch/
 │   └── visualization.launch.py  # Launch file
 ├── test/
 │   ├── test_data_fetcher.py
 │   ├── test_activity_processor.py
 │   └── test_visualization.py
+│   └── test_data/
+│       └── sample_activity_data.json
 ├── CMakeLists.txt
 ├── package.xml
 ├── requirements.txt
