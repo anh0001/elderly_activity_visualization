@@ -126,6 +126,9 @@ After importing the layout, you should see:
 - Controls for adjusting visualization parameters
 
 ## Data Flow
+
+![Data Flow Diagram](resource/media/data_flow_diagram.png)
+
 1. Data Fetching
    - System connects to NCGG server
    - Fetches latest activity data every second
