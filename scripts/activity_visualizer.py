@@ -39,32 +39,6 @@ class ActivityVisualizer(Node):
         self._publish_dummy_image()
         self.get_logger().info('Activity visualizer initialized')
 
-        # # Wait a short time to ensure topic advertisement
-        # self.create_timer(5.0, self._create_subscription_delayed, callback_group=None)
-        
-    # def _create_subscription_delayed(self):
-    #     """Create subscription after ensuring publisher is ready."""
-    #     qos_profile = QoSProfile(
-    #         reliability=QoSReliabilityPolicy.RELIABLE,
-    #         history=QoSHistoryPolicy.KEEP_LAST,
-    #         depth=10
-    #     )
-        
-    #     self.subscription = self.create_subscription(
-    #         String,
-    #         '/processed_activities',
-    #         self.visualization_callback,
-    #         qos_profile
-    #     )
-        
-    #     # Destroy the timer as it's no longer needed
-    #     for timer in self.get_timer_handles():
-    #         if timer.callback == self._create_subscription_delayed:
-    #             self.destroy_timer(timer)
-    #             break
-                
-    #     self.get_logger().info('Activity visualizer fully initialized')
-
     def _fig_to_jpeg_bytes(self, fig):
         """Convert matplotlib figure to JPEG bytes."""
         buf = io.BytesIO()
@@ -138,7 +112,7 @@ class ActivityVisualizer(Node):
             ax.set_theta_direction(-1)
             ax.set_xticks(angles[:-1])
             ax.set_xticklabels(activities, size=10)  # Adjusted font size for potentially longer labels
-            ax.set_title("Activities Duration Analysis", pad=20, size=14, weight='bold')
+            ax.set_title("Activities Duration", pad=20, size=14, weight='bold')
             ax.grid(True, color='gray', alpha=0.3)
             
             # Add value annotations
