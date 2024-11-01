@@ -117,7 +117,7 @@ class ICFStagingVisualizer(Node):
             # Set the labels and title
             ax.set_xticks(angles[:-1])
             ax.set_xticklabels(stages, size=12)
-            ax.set_title("ICF Staging Analysis", pad=20, size=14, weight='bold')
+            ax.set_title("ICF Staging", pad=20, size=14, weight='bold')
             
             # Configure radar chart
             ax.set_theta_offset(np.pi / 2)
