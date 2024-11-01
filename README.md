@@ -3,6 +3,8 @@
 ## Overview
 This ROS 2 package provides real-time visualization of elderly activities in a smart living room environment. Developed for demonstration at the National Center for Geriatrics and Gerontology (NCGG) in Nagoya, Japan, this system processes and visualizes various daily activities to help healthcare providers monitor and assess elderly residents' daily patterns.
 
+![Dashboard](resource/media/dashboard.jpg)
+
 ## Demo Location
 - **Institution**: National Center for Geriatrics and Gerontology (NCGG)
 - **Location**: Nagoya, Japan
