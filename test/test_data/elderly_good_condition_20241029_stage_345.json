@@ -1,0 +1,224 @@
+{
+  "data": [
+    {
+      "create_dt": "2024-10-29 07:15:00",
+      "action": "Lying",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "115.8"
+    },
+    {
+      "create_dt": "2024-10-29 07:16:56",
+      "action": "Sitting",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "42.3"
+    },
+    {
+      "create_dt": "2024-10-29 07:17:38",
+      "action": "Standing",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "28.7"
+    },
+    {
+      "create_dt": "2024-10-29 07:18:07",
+      "action": "Walking",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "16.2"
+    },
+    {
+      "create_dt": "2024-10-29 07:18:23",
+      "action": "Standing",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "22.4"
+    },
+    {
+      "create_dt": "2024-10-29 07:18:45",
+      "action": "Through_sleeve",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "43.8"
+    },
+    {
+      "create_dt": "2024-10-29 07:19:29",
+      "action": "Standing",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "19.8"
+    },
+    {
+      "create_dt": "2024-10-29 07:19:49",
+      "action": "Through_sleeve",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "40.2"
+    },
+    {
+      "create_dt": "2024-10-29 07:20:29",
+      "action": "Standing",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "17.6"
+    },
+    {
+      "create_dt": "2024-10-29 07:20:47",
+      "action": "Fasten_button",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "33.2"
+    },
+    {
+      "create_dt": "2024-10-29 07:21:20",
+      "action": "Walking",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "19.8"
+    },
+    {
+      "create_dt": "2024-10-29 07:21:40",
+      "action": "Standing",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "28.4"
+    },
+    {
+      "create_dt": "2024-10-29 07:22:08",
+      "action": "Grooming",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "115.6"
+    },
+    {
+      "create_dt": "2024-10-29 07:24:04",
+      "action": "Standing",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "23.5"
+    },
+    {
+      "create_dt": "2024-10-29 07:24:27",
+      "action": "Walking",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "17.4"
+    },
+    {
+      "create_dt": "2024-10-29 07:24:45",
+      "action": "Standing",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "85.4"
+    },
+    {
+      "create_dt": "2024-10-29 07:26:10",
+      "action": "Grooming",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "58.6"
+    },
+    {
+      "create_dt": "2024-10-29 07:27:09",
+      "action": "Walking",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "14.8"
+    },
+    {
+      "create_dt": "2024-10-29 07:27:24",
+      "action": "Standing",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "42.5"
+    },
+    {
+      "create_dt": "2024-10-29 07:28:06",
+      "action": "Sitting",
+      "transportation_stage": "3",
+      "grooming_stage": "4",
+      "mouth_care_stage": "5",
+      "basic_stage": "5",
+      "dressing_stage": "4",
+      "location": "1",
+      "duration": "175.3"
+    }
+  ]
+}
