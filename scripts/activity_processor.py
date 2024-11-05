@@ -12,8 +12,8 @@ class ActivityProcessor(Node):
     def __init__(self):
         super().__init__('activity_processor')
         
-        # Initialize action durations tracking
-        self.action_durations = defaultdict(float)
+        # Initialize action durations tracking per day
+        self.daily_action_durations = defaultdict(lambda: defaultdict(float))
         
         # Create subscription to raw data
         self.subscription = self.create_subscription(
@@ -53,50 +53,45 @@ class ActivityProcessor(Node):
             self.get_logger().error(f'Error processing data: {str(e)}')
             
     def process_activities(self, data):
-        """Process activity data and calculate durations."""
+        """Process activity data and calculate durations per day."""
         try:
-            for record in data:
-                self._process_record(record)
-                
-            # Publish processed data
-            self._publish_durations()
+            # Clear previous data to handle new batch
+            self.daily_action_durations.clear()
             
+            # Group activities by date and accumulate durations
+            for record in data:
+                date = datetime.strptime(record['create_dt'], '%Y-%m-%d %H:%M:%S').date()
+                action = record['action']
+                duration = float(record['duration'])
+                
+                self.daily_action_durations[date][action] += duration
+            
+            # Publish data for each day
+            for date, actions in self.daily_action_durations.items():
+                self._publish_day_data(date, actions)
+                
         except Exception as e:
             self.get_logger().error(f'Error in process_activities: {str(e)}')
 
-    def _process_record(self, record):
-        """Process individual activity record."""
+    def _publish_day_data(self, date, actions):
+        """Publish processed durations for a specific day."""
         try:
-            # Extract action and duration
-            action = record['action']
-            duration = float(record['duration'])
+            # Create timestamp for the end of the day
+            timestamp = datetime.combine(date, datetime.max.time()).isoformat()
             
-            # Add duration to the appropriate action
-            self.action_durations[action] += duration
-            
-            self.get_logger().debug(
-                f'Action {action} updated: {self.action_durations[action]}'
-            )
-                    
-        except Exception as e:
-            self.get_logger().error(f'Error processing record: {str(e)}')
-            
-    def _publish_durations(self):
-        """Publish processed durations as chart data."""
-        try:
             # Prepare message
             msg = String()
             msg.data = json.dumps({
                 'type': 'action_durations',
-                'timestamp': datetime.now().isoformat(),
-                'data': dict(self.action_durations)
+                'timestamp': timestamp,
+                'data': dict(actions)
             })
             
             # Publish message
             self.publisher.publish(msg)
             
             self.get_logger().debug(
-                f'Published action durations: {dict(self.action_durations)}'
+                f'Published action durations for {date}: {dict(actions)}'
             )
             
         except Exception as e:

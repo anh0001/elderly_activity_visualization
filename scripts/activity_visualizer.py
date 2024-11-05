@@ -56,12 +56,23 @@ class ActivityVisualizer(Node):
 
     def _update_daily_data(self, timestamp, data):
         """Update the daily data store with latest data point."""
-        date = self._extract_date(timestamp)
-        self.daily_data[date] = data
-        
-        # Keep only the last N days
-        while len(self.daily_data) > self.days_to_retain:
-            self.daily_data.popitem(last=False)  # Remove oldest entry
+        try:
+            date = self._extract_date(timestamp)
+            
+            # Store data with date as key
+            self.daily_data[date] = data
+            
+            # Sort dictionary by date
+            self.daily_data = OrderedDict(sorted(self.daily_data.items()))
+            
+            # Keep only the last N days
+            while len(self.daily_data) > self.days_to_retain:
+                self.daily_data.popitem(last=False)
+                
+            self.get_logger().info(f'Updated data for date {date}, total dates: {len(self.daily_data)}')
+            
+        except Exception as e:
+            self.get_logger().error(f'Error updating daily data: {str(e)}')
 
     def _fig_to_jpeg_bytes(self, fig):
         """Convert matplotlib figure to JPEG bytes."""
@@ -99,17 +110,19 @@ class ActivityVisualizer(Node):
         
     def visualization_callback(self, msg):
         try:
-            self.get_logger().debug('Received data on processed_activities')
+            self.get_logger().info('Received data on processed_activities')
             data = json.loads(msg.data)
             
             if data['type'] != 'action_durations' or not data['data']:
                 return
-                
+            
             # Update daily data store
             self._update_daily_data(data['timestamp'], data['data'])
             
             if not self.daily_data:
                 return
+            
+            self.get_logger().info(f'Plotting data for dates: {list(self.daily_data.keys())}')
                 
             # Create radar chart with more space for legend
             fig = Figure(figsize=(14, 10), facecolor='white', dpi=100)
@@ -147,7 +160,7 @@ class ActivityVisualizer(Node):
             ax.set_xticklabels(activities, size=10)
             
             # Add title and legend with adjusted position
-            ax.set_title("6-Day Activities Duration Comparison", 
+            ax.set_title("Activities Duration", 
                         pad=20, size=14, weight='bold')
             ax.grid(True, color='gray', alpha=0.3)
             ax.legend(loc='upper right', bbox_to_anchor=(1.4, 1.1),
@@ -174,7 +187,7 @@ class ActivityVisualizer(Node):
             # Publish and cleanup
             self.image_publisher.publish(msg)
             plt.close(fig)
-            self.get_logger().info('Successfully published 6-day radar chart')
+            self.get_logger().info('Successfully published radar chart')
             
         except Exception as e:
             self.get_logger().error(f'Error in visualization: {str(e)}')
