@@ -10,7 +10,7 @@ data_fetcher:
     
     # Test Data Configuration
     use_test_data: true  # Set to true to use test data instead of server
-    test_data_path: "test/test_data/sample_activity_data.json"
+    test_data_path: "test/test_data/scenario_AB.json"
     
     # Data Management
     max_cached_records: 1000
