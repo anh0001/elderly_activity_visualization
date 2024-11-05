@@ -22,23 +22,24 @@ class ICFStagingVisualizer(Node):
         # Store the last data point for each day
         self.daily_staging = {}
         
+        # Track current date being processed
+        self.current_date = None
+        
         # Human-readable stage names for display
         self.stage_names = {
-            'transportation': 'Transportation',
-            'grooming': 'Grooming',
-            'mouth_care': 'Mouth Care',
-            'basic': 'Basic',
-            'dressing': 'Dressing'
+            'transportation_stage': 'Transportation',
+            'grooming_stage': 'Grooming',
+            'mouth_care_stage': 'Mouth Care',
+            'basic_stage': 'Basic',
+            'dressing_stage': 'Dressing'
         }
         
-        # Create QoS profile for better reliability
         qos_profile = QoSProfile(
             reliability=QoSReliabilityPolicy.RELIABLE,
             history=QoSHistoryPolicy.KEEP_LAST,
             depth=10
         )
         
-        # Create subscription to processed staging data
         self.subscription = self.create_subscription(
             String,
             '/processed_icf_stages',
@@ -46,7 +47,6 @@ class ICFStagingVisualizer(Node):
             qos_profile
         )
         
-        # Create publisher for the visualization
         self.image_publisher = self.create_publisher(
             CompressedImage,
             '/icf_staging_visualization/compressed',
@@ -55,9 +55,8 @@ class ICFStagingVisualizer(Node):
         
         self._publish_dummy_image()
         self.get_logger().info('ICF staging visualizer initialized')
-        
+
     def _fig_to_jpeg_bytes(self, fig):
-        """Convert matplotlib figure to JPEG bytes."""
         buf = io.BytesIO()
         fig.savefig(buf, format='jpg', 
                    bbox_inches='tight', 
@@ -68,7 +67,6 @@ class ICFStagingVisualizer(Node):
         return buf.getvalue()
         
     def _publish_dummy_image(self):
-        """Publish an initialization image."""
         try:
             fig = Figure(figsize=(8, 8), facecolor='white')
             ax = fig.add_subplot(111)
@@ -87,15 +85,27 @@ class ICFStagingVisualizer(Node):
             
             self.image_publisher.publish(msg)
             plt.close(fig)
-            self.get_logger().info('Published initialization image')
             
         except Exception as e:
             self.get_logger().error(f'Error publishing dummy image: {str(e)}')
     
-    def _update_daily_staging(self, data, timestamp):
+    def _update_daily_staging(self, record):
         """Update the stored staging data for the day."""
-        date = timestamp.split('T')[0]
-        self.daily_staging[date] = data
+        # Extract date from create_dt
+        date = record['create_dt'].split()[0]
+        
+        # If it's a new date or first record, update current_date
+        if self.current_date != date:
+            self.current_date = date
+            
+        # Store staging data for this date
+        staging_data = {
+            key.replace('_stage', ''): value 
+            for key, value in record.items() 
+            if key in self.stage_names.keys()
+        }
+        
+        self.daily_staging[date] = staging_data
         
         # Keep only the most recent HISTORY_DAYS
         dates = sorted(self.daily_staging.keys())
@@ -104,18 +114,14 @@ class ICFStagingVisualizer(Node):
                 del self.daily_staging[old_date]
         
     def visualization_callback(self, msg):
-        """Process incoming staging data and create visualization."""
         try:
-            self.get_logger().info('Received data on processed_icf_stages')
             data = json.loads(msg.data)
             
-            if data['type'] != 'icf_staging' or not data['data']:
+            if not data.get('data'):
                 return
                 
-            self.get_logger().info(f'Received staging data: {data["data"]}')
-            
-            # Update daily staging data
-            self._update_daily_staging(data['data'], data['timestamp'])
+            # Update staging data for the record
+            self._update_daily_staging(data['data'])
             
             # Get stages
             stages = list(self.stage_names.values())
@@ -130,30 +136,31 @@ class ICFStagingVisualizer(Node):
             fig = Figure(figsize=(12, 8), facecolor='white', dpi=100)
             ax = fig.add_subplot(111, projection='polar')
             
-            # Colors and styles for different days
-            colors = ['blue', 'green', 'red']
-            line_styles = ['-', '--', '-.']
+            # Colors for different days
+            colors = ['blue', 'green', 'red', 'purple', 'orange', 'cyan']
+            line_styles = ['-', '--', '-.', ':', '-', '--']
             
             # Plot data for each day
             sorted_dates = sorted(self.daily_staging.keys())
             for i, date in enumerate(sorted_dates):
-                values = [float(self.daily_staging[date][stage]) for stage in stage_keys]
+                values = [float(self.daily_staging[date][stage.replace('_stage', '')]) 
+                         for stage in stage_keys]
                 values += values[:1]  # Complete the values circle
                 
-                label = f'Date: {date}'
+                label = datetime.strptime(date, '%Y-%m-%d').strftime('%Y-%m-%d')
                 ax.plot(angles, values, 'o-', linewidth=2, 
-                       color=colors[i], markersize=8,
-                       linestyle=line_styles[i],
+                       color=colors[i % len(colors)], markersize=8,
+                       linestyle=line_styles[i % len(line_styles)],
                        label=label, alpha=0.7)
-                ax.fill(angles, values, color=colors[i], alpha=0.1)
+                ax.fill(angles, values, color=colors[i % len(colors)], alpha=0.1)
                 
                 # Add value labels for the current day's data
-                if i == len(sorted_dates) - 1:  # Only for most recent day
+                if date == self.current_date:
                     for angle, value, stage in zip(angles[:-1], values[:-1], stages):
                         ax.text(angle, value, f'{int(value)}', 
                                horizontalalignment='center',
                                verticalalignment='bottom',
-                               color=colors[i])
+                               color=colors[i % len(colors)])
             
             # Configure radar chart
             ax.set_theta_offset(np.pi / 2)
@@ -187,7 +194,6 @@ class ICFStagingVisualizer(Node):
             
             self.image_publisher.publish(msg)
             plt.close(fig)
-            self.get_logger().info('Successfully published radar chart')
             
         except Exception as e:
             self.get_logger().error(f'Error in visualization: {str(e)}')

@@ -25,6 +25,9 @@ class ActivityVisualizer(Node):
         # Store the last data point for each day
         self.daily_data = {}
         
+        # Track current date being processed
+        self.current_date = None
+        
         qos_profile = QoSProfile(
             reliability=QoSReliabilityPolicy.RELIABLE,
             history=QoSHistoryPolicy.KEEP_LAST,
@@ -77,81 +80,114 @@ class ActivityVisualizer(Node):
             
             self.image_publisher.publish(msg)
             plt.close(fig)
-            self.get_logger().info('Published dummy image')
             
         except Exception as e:
             self.get_logger().error(f'Error publishing dummy image: {str(e)}')
             
-    def _update_daily_data(self, data, timestamp):
+    def _update_daily_data(self, record):
         """Update the stored data for the day."""
-        date = timestamp.split('T')[0]
-        self.daily_data[date] = data
+        # Extract date from create_dt
+        date = record['create_dt'].split()[0]
+        
+        # If it's a new date or first record, update current_date
+        if self.current_date != date:
+            self.current_date = date
+            
+        # Update activity data for this date
+        if date in self.daily_data:
+            self.daily_data[date]['duration'] = float(record['duration'])
+            self.daily_data[date]['action'] = record['action']
+        else:
+            self.daily_data[date] = {
+                'duration': float(record['duration']),
+                'action': record['action']
+            }
         
         # Keep only the most recent HISTORY_DAYS
         dates = sorted(self.daily_data.keys())
         if len(dates) > self.HISTORY_DAYS:
             for old_date in dates[:-self.HISTORY_DAYS]:
                 del self.daily_data[old_date]
-        
+                
     def visualization_callback(self, msg):
         try:
-            self.get_logger().info('Received data on processed_activities')
             data = json.loads(msg.data)
             
-            if data['type'] != 'action_durations' or not data['data']:
+            if not data.get('data'):
                 return
                 
-            self.get_logger().info(f'Received activity data: {data["data"]}')
+            # Update activity data for the record
+            self._update_daily_data(data['data'])
             
-            # Update daily data
-            self._update_daily_data(data['data'], data['timestamp'])
+            # Get unique actions and create activity data structure
+            all_actions = sorted(set(
+                record['action'] 
+                for daily_records in self.daily_data.values()
+                for record in [daily_records]  # Convert single record to list
+            ))
             
-            # Create radar chart
-            activities = list(data['data'].keys())
-            num_vars = len(activities)
-            
+            # Compute angles for the radar chart
+            num_vars = len(all_actions)
             if num_vars == 0:
                 return
-            
-            # Compute angles
+                
             angles = [n / float(num_vars) * 2 * np.pi for n in range(num_vars)]
-            angles += angles[:1]
+            angles += angles[:1]  # Complete the circle
             
             # Create figure
             fig = Figure(figsize=(12, 8), facecolor='white', dpi=100)
             ax = fig.add_subplot(111, projection='polar')
             
-            # Colors for different days
-            colors = ['blue', 'green', 'red']
+            # Colors and styles for different days
+            colors = ['blue', 'green', 'red', 'purple', 'orange', 'cyan']
+            line_styles = ['-', '--', '-.', ':', '-', '--']
             
             # Plot data for each day
             sorted_dates = sorted(self.daily_data.keys())
             for i, date in enumerate(sorted_dates):
-                values = [self.daily_data[date][activity] for activity in activities]
+                # Create values array with durations for each action
+                values = []
+                for action in all_actions:
+                    if self.daily_data[date]['action'] == action:
+                        values.append(self.daily_data[date]['duration'])
+                    else:
+                        values.append(0)  # No duration for this action on this date
+                        
                 values += values[:1]  # Complete the circle
                 
-                label = f'Date: {date}'
+                label = datetime.strptime(date, '%Y-%m-%d').strftime('%Y-%m-%d')
                 ax.plot(angles, values, 'o-', linewidth=2, 
-                       color=colors[i], markersize=8,
+                       color=colors[i % len(colors)], markersize=8,
+                       linestyle=line_styles[i % len(line_styles)],
                        label=label, alpha=0.7)
-                ax.fill(angles, values, color=colors[i], alpha=0.1)
+                ax.fill(angles, values, color=colors[i % len(colors)], alpha=0.1)
+                
+                # Add value labels for the current day's data
+                if date == self.current_date:
+                    for angle, value, action in zip(angles[:-1], values[:-1], all_actions):
+                        if value > 0:
+                            ax.text(angle, value, f'{value:.1f}s', 
+                                   horizontalalignment='center',
+                                   verticalalignment='bottom',
+                                   color=colors[i % len(colors)])
             
             # Configure chart
             ax.set_theta_offset(np.pi / 2)
             ax.set_theta_direction(-1)
             ax.set_xticks(angles[:-1])
-            ax.set_xticklabels(activities, size=10)
+            ax.set_xticklabels(all_actions, size=10)
             
             # Set title with date range
             if sorted_dates:
-                title = f"Activities Duration\n{sorted_dates[0]} to {sorted_dates[-1]}"
+                title = f"Activity Durations\n{sorted_dates[0]} to {sorted_dates[-1]}"
             else:
-                title = "Activities Duration"
+                title = "Activity Durations"
             ax.set_title(title, pad=20, size=14, weight='bold')
             
             # Add legend
             ax.legend(loc='center left', bbox_to_anchor=(1.2, 0.5))
             
+            # Add grid
             ax.grid(True, color='gray', alpha=0.3)
             
             # Create message
@@ -164,7 +200,6 @@ class ActivityVisualizer(Node):
             # Publish and cleanup
             self.image_publisher.publish(msg)
             plt.close(fig)
-            self.get_logger().info('Successfully published radar chart')
             
         except Exception as e:
             self.get_logger().error(f'Error in visualization: {str(e)}')
