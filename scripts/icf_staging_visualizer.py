@@ -11,19 +11,18 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import io
 from datetime import datetime
+from collections import OrderedDict
 
 class ICFStagingVisualizer(Node):
     def __init__(self):
         super().__init__('icf_staging_visualizer')
         
         # Configure number of days to show in history
-        self.HISTORY_DAYS = 6
+        self.declare_parameter('days_to_retain', 6)
         
-        # Store the last data point for each day
-        self.daily_staging = {}
-        
-        # Track current date being processed
-        self.current_date = None
+        # Store the staging data for each day
+        self.daily_staging = OrderedDict()
+        self.days_to_retain = self.get_parameter('days_to_retain').value
         
         # Human-readable stage names for display
         self.stage_names = {
@@ -33,6 +32,10 @@ class ICFStagingVisualizer(Node):
             'basic_stage': 'Basic',
             'dressing_stage': 'Dressing'
         }
+        
+        # Colors for different days
+        self.colors = ['blue', 'green', 'red', 'purple', 'orange', 'cyan']
+        self.line_styles = ['-', '--', '-.', ':', '-', '--']
         
         qos_profile = QoSProfile(
             reliability=QoSReliabilityPolicy.RELIABLE,
@@ -55,6 +58,34 @@ class ICFStagingVisualizer(Node):
         
         self._publish_dummy_image()
         self.get_logger().info('ICF staging visualizer initialized')
+
+    def _extract_date(self, timestamp):
+        """Extract date from timestamp string."""
+        return timestamp.split()[0]
+
+    def _update_daily_staging(self, timestamp, data):
+        """Update the stored staging data for the day."""
+        try:
+            date = self._extract_date(timestamp)
+            
+            # Store staging data for this date
+            self.daily_staging[date] = {
+                key: value for key, value in data.items() 
+                if key in self.stage_names.keys()
+            }
+            
+            # Sort dictionary by date
+            self.daily_staging = OrderedDict(sorted(self.daily_staging.items()))
+            
+            # Keep only the most recent days_to_retain days
+            while len(self.daily_staging) > self.days_to_retain:
+                self.daily_staging.popitem(first=True)
+                
+            self.get_logger().info(f'Updated staging for {date}, total dates: {len(self.daily_staging)}')
+            self.get_logger().info(f'Current dates in store: {list(self.daily_staging.keys())}')
+            
+        except Exception as e:
+            self.get_logger().error(f'Error updating daily staging: {str(e)}')
 
     def _fig_to_jpeg_bytes(self, fig):
         buf = io.BytesIO()
@@ -88,112 +119,86 @@ class ICFStagingVisualizer(Node):
             
         except Exception as e:
             self.get_logger().error(f'Error publishing dummy image: {str(e)}')
-    
-    def _update_daily_staging(self, record):
-        """Update the stored staging data for the day."""
-        # Extract date from create_dt
-        date = record['create_dt'].split()[0]
-        
-        # If it's a new date or first record, update current_date
-        if self.current_date != date:
-            self.current_date = date
-            
-        # Store staging data for this date
-        staging_data = {
-            key.replace('_stage', ''): value 
-            for key, value in record.items() 
-            if key in self.stage_names.keys()
-        }
-        
-        self.daily_staging[date] = staging_data
-        
-        # Keep only the most recent HISTORY_DAYS
-        dates = sorted(self.daily_staging.keys())
-        if len(dates) > self.HISTORY_DAYS:
-            for old_date in dates[:-self.HISTORY_DAYS]:
-                del self.daily_staging[old_date]
         
     def visualization_callback(self, msg):
         try:
             data = json.loads(msg.data)
             
-            if not data.get('data'):
+            if data['type'] != 'icf_staging' or not data['data']:
                 return
                 
-            # Update staging data for the record
-            self._update_daily_staging(data['data'])
+            # Update staging data
+            self._update_daily_staging(data['timestamp'], data['data'])
             
-            # Get stages
+            if not self.daily_staging:
+                return
+                
+            # Create figure
+            fig = Figure(figsize=(14, 10), facecolor='white', dpi=100)
+            ax = fig.add_subplot(111, projection='polar')
+            
+            # Get stages and compute angles
             stages = list(self.stage_names.values())
             stage_keys = list(self.stage_names.keys())
             
-            # Compute angles for the radar chart
             num_vars = len(stages)
             angles = [n / float(num_vars) * 2 * np.pi for n in range(num_vars)]
-            angles += angles[:1]  # Complete the circle
+            angles += angles[:1]
             
-            # Create figure
-            fig = Figure(figsize=(12, 8), facecolor='white', dpi=100)
-            ax = fig.add_subplot(111, projection='polar')
-            
-            # Colors for different days
-            colors = ['blue', 'green', 'red', 'purple', 'orange', 'cyan']
-            line_styles = ['-', '--', '-.', ':', '-', '--']
-            
-            # Plot data for each day
-            sorted_dates = sorted(self.daily_staging.keys())
-            for i, date in enumerate(sorted_dates):
-                values = [float(self.daily_staging[date][stage.replace('_stage', '')]) 
-                         for stage in stage_keys]
-                values += values[:1]  # Complete the values circle
+            # Plot each day's data
+            for i, (date, staging) in enumerate(self.daily_staging.items()):
+                values = [float(staging[stage]) for stage in stage_keys]
+                values += values[:1]
                 
-                label = datetime.strptime(date, '%Y-%m-%d').strftime('%Y-%m-%d')
-                ax.plot(angles, values, 'o-', linewidth=2, 
-                       color=colors[i % len(colors)], markersize=8,
-                       linestyle=line_styles[i % len(line_styles)],
-                       label=label, alpha=0.7)
-                ax.fill(angles, values, color=colors[i % len(colors)], alpha=0.1)
+                color = self.colors[i % len(self.colors)]
+                style = self.line_styles[i % len(self.line_styles)]
                 
-                # Add value labels for the current day's data
-                if date == self.current_date:
+                self.get_logger().info(f'Plotting data for {date} with color {color}')
+                
+                # Plot data
+                line = ax.plot(angles, values, 'o-', linewidth=2.5,
+                             label=date, color=color, markersize=8,
+                             linestyle=style, alpha=0.7)
+                ax.fill(angles, values, color=color, alpha=0.15)
+                
+                # Add value labels for most recent date
+                if i == len(self.daily_staging) - 1:
                     for angle, value, stage in zip(angles[:-1], values[:-1], stages):
-                        ax.text(angle, value, f'{int(value)}', 
-                               horizontalalignment='center',
-                               verticalalignment='bottom',
-                               color=colors[i % len(colors)])
+                        if value > 0:
+                            ax.text(angle, value*1.1, f'{int(value)}',
+                                   horizontalalignment='center',
+                                   verticalalignment='center',
+                                   color=color)
             
-            # Configure radar chart
+            # Configure chart
             ax.set_theta_offset(np.pi / 2)
             ax.set_theta_direction(-1)
             ax.set_xticks(angles[:-1])
-            ax.set_xticklabels(stages, size=12)
+            ax.set_xticklabels(stages, size=10)
             
-            # Set title with date range
-            if sorted_dates:
-                title = f"ICF Staging Progress\n{sorted_dates[0]} to {sorted_dates[-1]}"
-            else:
-                title = "ICF Staging Progress"
-            ax.set_title(title, pad=20, size=14, weight='bold')
-            
-            # Set radial limits based on ICF scale (typically 1-5)
+            # Set title and limits
+            ax.set_title("ICF Staging Progress", pad=20, size=14, weight='bold')
             ax.set_ylim(0, 5)
             ax.set_rgrids([1, 2, 3, 4, 5], angle=0)
             
-            # Add legend
-            ax.legend(loc='center left', bbox_to_anchor=(1.2, 0.5))
+            # Add legend with adjusted position
+            legend = ax.legend(loc='upper right', bbox_to_anchor=(1.4, 1.1),
+                             title="Dates", title_fontsize=12)
             
             # Add grid
             ax.grid(True, color='gray', alpha=0.3)
             
-            # Create and publish message
+            # Create message
             msg = CompressedImage()
             msg.header.stamp = self.get_clock().now().to_msg()
             msg.header.frame_id = "map"
             msg.format = "jpeg"
             msg.data = self._fig_to_jpeg_bytes(fig)
             
+            # Publish and cleanup
             self.image_publisher.publish(msg)
             plt.close(fig)
+            self.get_logger().info('Successfully published ICF staging chart')
             
         except Exception as e:
             self.get_logger().error(f'Error in visualization: {str(e)}')

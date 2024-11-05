@@ -12,8 +12,9 @@ class ActivityProcessor(Node):
     def __init__(self):
         super().__init__('activity_processor')
         
-        # Initialize action durations tracking per day
+        # Initialize action durations tracking per day - will accumulate over time
         self.daily_action_durations = defaultdict(lambda: defaultdict(float))
+        self.all_activities = set()  # Track all possible activities
         
         # Create subscription to raw data
         self.subscription = self.create_subscription(
@@ -53,22 +54,32 @@ class ActivityProcessor(Node):
             self.get_logger().error(f'Error processing data: {str(e)}')
             
     def process_activities(self, data):
-        """Process activity data and calculate durations per day."""
+        """Process activity data and accumulate durations per day."""
         try:
-            # Clear previous data to handle new batch
-            self.daily_action_durations.clear()
-            
-            # Group activities by date and accumulate durations
+            # Accumulate durations for each activity per day
             for record in data:
                 date = datetime.strptime(record['create_dt'], '%Y-%m-%d %H:%M:%S').date()
                 action = record['action']
                 duration = float(record['duration'])
                 
+                self.all_activities.add(action)
                 self.daily_action_durations[date][action] += duration
             
-            # Publish data for each day
+            # Ensure all days have all activities
+            for date in self.daily_action_durations.keys():
+                for action in self.all_activities:
+                    if action not in self.daily_action_durations[date]:
+                        self.daily_action_durations[date][action] = 0.0
+            
+            # Publish updated data for each day
             for date, actions in self.daily_action_durations.items():
                 self._publish_day_data(date, actions)
+                
+            self.get_logger().info(
+                f'Processed data for {len(data)} records, '
+                f'Total days: {len(self.daily_action_durations)}, '
+                f'Total activities: {len(self.all_activities)}'
+            )
                 
         except Exception as e:
             self.get_logger().error(f'Error in process_activities: {str(e)}')
@@ -79,7 +90,7 @@ class ActivityProcessor(Node):
             # Create timestamp for the end of the day
             timestamp = datetime.combine(date, datetime.max.time()).isoformat()
             
-            # Prepare message
+            # Prepare message with all activities
             msg = String()
             msg.data = json.dumps({
                 'type': 'action_durations',

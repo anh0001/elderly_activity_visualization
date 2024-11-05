@@ -18,7 +18,7 @@ class ActivityVisualizer(Node):
     def __init__(self):
         super().__init__('activity_visualizer')
         
-        # Parameter for number of days to retain - changed to 6
+        # Parameter for number of days to retain
         self.declare_parameter('days_to_retain', 6)
         
         qos_profile = QoSProfile(
@@ -48,7 +48,7 @@ class ActivityVisualizer(Node):
         self.colors = ['blue', 'green', 'red', 'purple', 'orange', 'cyan']
         
         self._publish_dummy_image()
-        self.get_logger().info('Activity visualizer initialized with 6-day retention')
+        self.get_logger().info('Activity visualizer initialized')
 
     def _extract_date(self, timestamp):
         """Extract date from timestamp string."""
@@ -67,9 +67,10 @@ class ActivityVisualizer(Node):
             
             # Keep only the last N days
             while len(self.daily_data) > self.days_to_retain:
-                self.daily_data.popitem(last=False)
+                self.daily_data.popitem(first=True)  # Remove oldest entry
                 
             self.get_logger().info(f'Updated data for date {date}, total dates: {len(self.daily_data)}')
+            self.get_logger().info(f'Current dates in store: {list(self.daily_data.keys())}')
             
         except Exception as e:
             self.get_logger().error(f'Error updating daily data: {str(e)}')
@@ -110,19 +111,17 @@ class ActivityVisualizer(Node):
         
     def visualization_callback(self, msg):
         try:
-            self.get_logger().info('Received data on processed_activities')
+            self.get_logger().debug('Received data on processed_activities')
             data = json.loads(msg.data)
             
             if data['type'] != 'action_durations' or not data['data']:
                 return
-            
+                
             # Update daily data store
             self._update_daily_data(data['timestamp'], data['data'])
             
             if not self.daily_data:
                 return
-            
-            self.get_logger().info(f'Plotting data for dates: {list(self.daily_data.keys())}')
                 
             # Create radar chart with more space for legend
             fig = Figure(figsize=(14, 10), facecolor='white', dpi=100)
@@ -142,16 +141,18 @@ class ActivityVisualizer(Node):
             angles = [n / float(num_vars) * 2 * np.pi for n in range(num_vars)]
             angles += angles[:1]
             
-            # Plot each day's data
-            for (date, day_data), color in zip(self.daily_data.items(), self.colors):
+            # Plot each day's data with explicit color assignment
+            for i, ((date, day_data), color) in enumerate(zip(self.daily_data.items(), self.colors)):
                 values = [day_data.get(activity, 0) for activity in activities]
                 values += values[:1]
                 
+                label = date.strftime('%Y-%m-%d')
+                self.get_logger().info(f'Plotting data for {label} with color {color}')
+                
                 # Plot data with increased line width for better visibility
-                ax.plot(angles, values, 'o-', linewidth=2.5, 
-                       label=date.strftime('%Y-%m-%d'),
-                       color=color, markersize=8)
-                ax.fill(angles, values, alpha=0.15, color=color)  # Reduced alpha for less overlap
+                line = ax.plot(angles, values, 'o-', linewidth=2.5, 
+                             label=label, color=color, markersize=8)
+                ax.fill(angles, values, alpha=0.15, color=color)
             
             # Configure chart
             ax.set_theta_offset(np.pi / 2)
@@ -163,8 +164,10 @@ class ActivityVisualizer(Node):
             ax.set_title("Activities Duration", 
                         pad=20, size=14, weight='bold')
             ax.grid(True, color='gray', alpha=0.3)
-            ax.legend(loc='upper right', bbox_to_anchor=(1.4, 1.1),
-                     title="Dates", title_fontsize=12)
+            
+            # Ensure legend includes all dates
+            legend = ax.legend(loc='upper right', bbox_to_anchor=(1.4, 1.1),
+                             title="Dates", title_fontsize=12)
             
             # Add value annotations for the most recent day
             latest_data = list(self.daily_data.values())[-1]

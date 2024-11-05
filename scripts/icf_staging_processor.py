@@ -6,6 +6,7 @@ from std_msgs.msg import String
 import json
 from datetime import datetime
 from rclpy.qos import QoSProfile, QoSReliabilityPolicy, QoSHistoryPolicy, QoSDurabilityPolicy
+from collections import defaultdict
 
 class ICFStagingProcessor(Node):
     def __init__(self):
@@ -20,8 +21,8 @@ class ICFStagingProcessor(Node):
             'dressing': 'dressing_stage'
         }
         
-        # Initialize stage values
-        self.stage_values = {}
+        # Store daily stage values
+        self.daily_stage_values = defaultdict(dict)
         
         # Create subscription to raw data
         self.subscription = self.create_subscription(
@@ -31,7 +32,6 @@ class ICFStagingProcessor(Node):
             100
         )
         
-        # Create QoS profile for sensor-like data
         qos_profile = QoSProfile(
             reliability=QoSReliabilityPolicy.RELIABLE,
             history=QoSHistoryPolicy.KEEP_LAST,
@@ -50,12 +50,8 @@ class ICFStagingProcessor(Node):
     def raw_data_callback(self, msg):
         """Handle incoming raw activity data."""
         try:
-            # Parse the incoming JSON data
             data = json.loads(msg.data)
-            
-            # Process the staging data
             self.process_staging(data['data'])
-            
         except json.JSONDecodeError as e:
             self.get_logger().error(f'Error decoding JSON: {str(e)}')
         except Exception as e:
@@ -64,48 +60,56 @@ class ICFStagingProcessor(Node):
     def process_staging(self, data):
         """Process ICF staging data."""
         try:
-            if data:  # Process only if there's data
-                # Get the most recent record (first in the list)
-                latest_record = data[0]
-                self._process_record(latest_record)
+            for record in data:
+                date = record['create_dt'].split()[0]
+                self._process_record(record, date)
                 
-                # Publish processed data
-                self._publish_staging_data()
+            # Publish processed data for each date
+            for date, stages in self.daily_stage_values.items():
+                self._publish_staging_data(date, stages)
             
         except Exception as e:
             self.get_logger().error(f'Error in process_staging: {str(e)}')
 
-    def _process_record(self, record):
+    def _process_record(self, record, date):
         """Process individual ICF staging record."""
         try:
-            # For each defined stage
+            current_stages = {}
             for stage_name, field_name in self.stages.items():
-                # Get the stage value
-                self.stage_values[stage_name] = record[field_name]
-                
-                self.get_logger().debug(
-                    f'Stage {stage_name} value: {self.stage_values[stage_name]}'
-                )
+                current_stages[field_name] = record[field_name]
+            
+            # Update the daily values
+            self.daily_stage_values[date] = current_stages
+            
+            self.get_logger().debug(
+                f'Updated stages for date {date}: {current_stages}'
+            )
                     
         except Exception as e:
             self.get_logger().error(f'Error processing record: {str(e)}')
             
-    def _publish_staging_data(self):
-        """Publish processed staging data."""
+    def _publish_staging_data(self, date, stages):
+        """Publish processed staging data for a specific date."""
         try:
+            # Create timestamp at end of the day
+            timestamp = f"{date} 23:59:59"
+            
             # Prepare message
             msg = String()
             msg.data = json.dumps({
                 'type': 'icf_staging',
-                'timestamp': datetime.now().isoformat(),
-                'data': self.stage_values
+                'timestamp': timestamp,
+                'data': {
+                    'create_dt': timestamp,
+                    **stages
+                }
             })
             
             # Publish message
             self.publisher.publish(msg)
             
             self.get_logger().debug(
-                f'Published ICF staging data: {self.stage_values}'
+                f'Published ICF staging data for {date}: {stages}'
             )
             
         except Exception as e:
