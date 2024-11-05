@@ -33,8 +33,8 @@ class ICFStagingVisualizer(Node):
             'dressing_stage': 'Dressing'
         }
         
-        # Colors for different days
-        self.colors = ['blue', 'green', 'red', 'purple', 'orange', 'cyan']
+        # Colors for different days with higher contrast
+        self.colors = ['blue', 'red', 'green', 'purple', 'orange', 'cyan']
         self.line_styles = ['-', '--', '-.', ':', '-', '--']
         
         qos_profile = QoSProfile(
@@ -61,13 +61,23 @@ class ICFStagingVisualizer(Node):
 
     def _extract_date(self, timestamp):
         """Extract date from timestamp string."""
-        return timestamp.split()[0]
+        try:
+            if ' ' in timestamp:
+                date_str = timestamp.split()[0]
+            else:
+                date_str = timestamp
+            return datetime.strptime(date_str, '%Y-%m-%d').date()
+        except Exception as e:
+            self.get_logger().error(f'Error extracting date from {timestamp}: {str(e)}')
+            return None
 
     def _update_daily_staging(self, timestamp, data):
         """Update the stored staging data for the day."""
         try:
             date = self._extract_date(timestamp)
-            
+            if date is None:
+                return
+                
             # Store staging data for this date
             self.daily_staging[date] = {
                 key: value for key, value in data.items() 
@@ -81,45 +91,11 @@ class ICFStagingVisualizer(Node):
             while len(self.daily_staging) > self.days_to_retain:
                 self.daily_staging.popitem(first=True)
                 
-            self.get_logger().info(f'Updated staging for {date}, total dates: {len(self.daily_staging)}')
-            self.get_logger().info(f'Current dates in store: {list(self.daily_staging.keys())}')
+            self.get_logger().info(f'Current dates in store: {[d.strftime("%Y-%m-%d") for d in self.daily_staging.keys()]}')
             
         except Exception as e:
             self.get_logger().error(f'Error updating daily staging: {str(e)}')
 
-    def _fig_to_jpeg_bytes(self, fig):
-        buf = io.BytesIO()
-        fig.savefig(buf, format='jpg', 
-                   bbox_inches='tight', 
-                   facecolor='white',
-                   dpi=100,
-                   pad_inches=0.5)
-        buf.seek(0)
-        return buf.getvalue()
-        
-    def _publish_dummy_image(self):
-        try:
-            fig = Figure(figsize=(8, 8), facecolor='white')
-            ax = fig.add_subplot(111)
-            ax.text(0.5, 0.5, 'Initializing ICF Staging Visualization...', 
-                   horizontalalignment='center',
-                   verticalalignment='center',
-                   transform=ax.transAxes,
-                   fontsize=14)
-            ax.axis('off')
-            
-            msg = CompressedImage()
-            msg.header.stamp = self.get_clock().now().to_msg()
-            msg.header.frame_id = "map"
-            msg.format = "jpeg"
-            msg.data = self._fig_to_jpeg_bytes(fig)
-            
-            self.image_publisher.publish(msg)
-            plt.close(fig)
-            
-        except Exception as e:
-            self.get_logger().error(f'Error publishing dummy image: {str(e)}')
-        
     def visualization_callback(self, msg):
         try:
             data = json.loads(msg.data)
@@ -145,29 +121,36 @@ class ICFStagingVisualizer(Node):
             angles = [n / float(num_vars) * 2 * np.pi for n in range(num_vars)]
             angles += angles[:1]
             
+            # Get list of dates for plotting
+            plot_dates = list(self.daily_staging.keys())
+            self.get_logger().info(f'Plotting data for dates: {[d.strftime("%Y-%m-%d") for d in plot_dates]}')
+            
             # Plot each day's data
-            for i, (date, staging) in enumerate(self.daily_staging.items()):
+            for i, date in enumerate(plot_dates):
+                staging = self.daily_staging[date]
                 values = [float(staging[stage]) for stage in stage_keys]
                 values += values[:1]
                 
                 color = self.colors[i % len(self.colors)]
                 style = self.line_styles[i % len(self.line_styles)]
                 
-                self.get_logger().info(f'Plotting data for {date} with color {color}')
+                # Format date for legend
+                date_label = date.strftime('%Y-%m-%d')
                 
-                # Plot data
+                # Plot data with increased line width and marker size
                 line = ax.plot(angles, values, 'o-', linewidth=2.5,
-                             label=date, color=color, markersize=8,
-                             linestyle=style, alpha=0.7)
+                             label=date_label, color=color, markersize=8,
+                             linestyle=style, alpha=0.8)
                 ax.fill(angles, values, color=color, alpha=0.15)
                 
                 # Add value labels for most recent date
-                if i == len(self.daily_staging) - 1:
+                if date == plot_dates[-1]:
                     for angle, value, stage in zip(angles[:-1], values[:-1], stages):
                         if value > 0:
                             ax.text(angle, value*1.1, f'{int(value)}',
                                    horizontalalignment='center',
                                    verticalalignment='center',
+                                   size=10, weight='bold',
                                    color=color)
             
             # Configure chart
@@ -177,13 +160,13 @@ class ICFStagingVisualizer(Node):
             ax.set_xticklabels(stages, size=10)
             
             # Set title and limits
-            ax.set_title("ICF Staging Progress", pad=20, size=14, weight='bold')
+            ax.set_title("ICF Staging", pad=20, size=14, weight='bold')
             ax.set_ylim(0, 5)
             ax.set_rgrids([1, 2, 3, 4, 5], angle=0)
             
-            # Add legend with adjusted position
+            # Add legend with adjusted position and larger font
             legend = ax.legend(loc='upper right', bbox_to_anchor=(1.4, 1.1),
-                             title="Dates", title_fontsize=12)
+                             title="Dates", title_fontsize=12, fontsize=10)
             
             # Add grid
             ax.grid(True, color='gray', alpha=0.3)
@@ -198,10 +181,44 @@ class ICFStagingVisualizer(Node):
             # Publish and cleanup
             self.image_publisher.publish(msg)
             plt.close(fig)
-            self.get_logger().info('Successfully published ICF staging chart')
             
         except Exception as e:
             self.get_logger().error(f'Error in visualization: {str(e)}')
+            
+    def _fig_to_jpeg_bytes(self, fig):
+        """Convert matplotlib figure to JPEG bytes."""
+        buf = io.BytesIO()
+        fig.savefig(buf, format='jpg', 
+                   bbox_inches='tight', 
+                   facecolor='white',
+                   dpi=100,
+                   pad_inches=0.5)
+        buf.seek(0)
+        return buf.getvalue()
+        
+    def _publish_dummy_image(self):
+        """Publish initial dummy image."""
+        try:
+            fig = Figure(figsize=(8, 8), facecolor='white')
+            ax = fig.add_subplot(111)
+            ax.text(0.5, 0.5, 'Initializing ICF Staging Visualization...', 
+                   horizontalalignment='center',
+                   verticalalignment='center',
+                   transform=ax.transAxes,
+                   fontsize=14)
+            ax.axis('off')
+            
+            msg = CompressedImage()
+            msg.header.stamp = self.get_clock().now().to_msg()
+            msg.header.frame_id = "map"
+            msg.format = "jpeg"
+            msg.data = self._fig_to_jpeg_bytes(fig)
+            
+            self.image_publisher.publish(msg)
+            plt.close(fig)
+            
+        except Exception as e:
+            self.get_logger().error(f'Error publishing dummy image: {str(e)}')
 
 def main(args=None):
     rclpy.init(args=args)
