@@ -1,0 +1,6 @@
+{"action": "brush_teeth", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.1200566291809082, "location": 3}
+{"action": "Grooming", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.0, "location": 3}
+{"action": "brush_teeth", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.12266993522644043, "location": 3}
+{"action": "Grooming", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.12324953079223633, "location": 3}
+{"action": "brush_teeth", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.0, "location": 3}
+{"action": "Grooming", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.11502528190612793, "location": 3}

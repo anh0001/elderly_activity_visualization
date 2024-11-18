@@ -1,0 +1,5 @@
+{"action": "Walking", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.12702631950378418, "location": 1}
+{"action": "Standing", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.0010004043579101562, "location": 1}
+{"action": "Walking", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.12458324432373047, "location": 1}
+{"action": "Standing", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.0, "location": 1}
+{"action": "Walking", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.12033867835998535, "location": 1}

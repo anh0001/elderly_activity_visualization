@@ -1,0 +1,11 @@
+{"action": "Wash_hands", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 7.081592559814453, "location": 3}
+{"action": "brush_teeth", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.22435784339904785, "location": 3}
+{"action": "Grooming", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.1267995834350586, "location": 3}
+{"action": "brush_teeth", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.0, "location": 3}
+{"action": "Grooming", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.12554502487182617, "location": 3}
+{"action": "brush_teeth", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.0010004043579101562, "location": 3}
+{"action": "Grooming", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.11351776123046875, "location": 3}
+{"action": "brush_teeth", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.12026548385620117, "location": 3}
+{"action": "Grooming", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.0, "location": 3}
+{"action": "brush_teeth", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.11105203628540039, "location": 3}
+{"action": "Grooming", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.0, "location": 3}

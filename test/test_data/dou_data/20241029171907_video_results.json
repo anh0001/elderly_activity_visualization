@@ -1,0 +1,6 @@
+{"action": "Through_sleeve", "stage": {"dressing_stage": 3, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 4.333738088607788, "location": 2}
+{"action": "Fasten_button", "stage": {"dressing_stage": 3, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.1236565113067627, "location": 2}
+{"action": "Through_sleeve", "stage": {"dressing_stage": 3, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.0, "location": 2}
+{"action": "Fasten_button", "stage": {"dressing_stage": 3, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.129194974899292, "location": 2}
+{"action": "Through_sleeve", "stage": {"dressing_stage": 3, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.0010004043579101562, "location": 2}
+{"action": "Fasten_button", "stage": {"dressing_stage": 3, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.1256556510925293, "location": 2}

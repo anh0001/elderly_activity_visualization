@@ -1,0 +1,11 @@
+{"action": "Walking", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 3.0950775146484375, "location": 1}
+{"action": "Sitting", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.0, "location": 1}
+{"action": "Walking", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.12540054321289062, "location": 1}
+{"action": "Sitting", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.0, "location": 1}
+{"action": "Walking", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.11702537536621094, "location": 1}
+{"action": "Sitting", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.0010001659393310547, "location": 1}
+{"action": "Walking", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.12026000022888184, "location": 1}
+{"action": "Sitting", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.0, "location": 1}
+{"action": "Walking", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.11455559730529785, "location": 1}
+{"action": "Sitting", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.0, "location": 1}
+{"action": "Walking", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.11055898666381836, "location": 1}

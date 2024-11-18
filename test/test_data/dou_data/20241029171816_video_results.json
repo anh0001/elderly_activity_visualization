@@ -1,0 +1,2 @@
+{"action": "Through_sleeve", "stage": {"dressing_stage": 2, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.7081034183502197, "location": 2}
+{"action": "Sitting", "stage": {"dressing_stage": 2, "basic_stage": 5, "grooming_stage": 4, "mouth_care_stage": 4, "transportation_stage": 3}, "duration": 0.0010006427764892578, "location": 2}

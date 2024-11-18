@@ -1,0 +1,3 @@
+{"action": "Walking", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 2.5482442378997803, "location": 1}
+{"action": "Sitting", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.1174471378326416, "location": 1}
+{"action": "Walking", "stage": {"dressing_stage": 1, "basic_stage": 5, "grooming_stage": 1, "mouth_care_stage": 1, "transportation_stage": 3}, "duration": 0.0, "location": 1}
